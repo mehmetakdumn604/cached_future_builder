@@ -1,11 +1,11 @@
 import 'dart:developer';
 
-import 'package:cached_future_builder/main.dart';
+import 'package:cached_future_builder/cached_future_builder.dart';
 import 'package:cached_future_builder/src/models/local_cache_manager.dart';
 import 'package:flutter/material.dart';
 
-class AsyncFutureBuilder<T> extends StatefulWidget {
-  const AsyncFutureBuilder({super.key, this.future, required this.onData, this.onWaiting, this.onError, this.onNoData, this.cacheManager});
+class CachedFutureBuilder<T> extends StatefulWidget {
+  const CachedFutureBuilder({super.key, this.future, required this.onData, this.onWaiting, this.onError, this.onNoData, this.cacheManager});
   final Future<T?>? future;
   final Widget Function(T?) onData;
   final Widget Function()? onWaiting;
@@ -15,10 +15,10 @@ class AsyncFutureBuilder<T> extends StatefulWidget {
   final LocalCacheManager? cacheManager;
 
   @override
-  State<AsyncFutureBuilder<T>> createState() => _AsyncFutureBuilderState<T>();
+  State<CachedFutureBuilder<T>> createState() => _CachedFutureBuilderState<T>();
 }
 
-class _AsyncFutureBuilderState<T> extends State<AsyncFutureBuilder<T>> with AutomaticKeepAliveClientMixin {
+class _CachedFutureBuilderState<T> extends State<CachedFutureBuilder<T>> with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
