@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_future_builder/cached_future_builder.dart';
 import 'package:cached_future_builder/src/models/local_cache_manager.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +20,15 @@ class _CachedFutureBuilderState<T> extends State<CachedFutureBuilder<T>> with Au
   @override
   void initState() {
     super.initState();
-    widget.cacheManager?.init();
+    if (widget.cacheManager != null) {
+      widget.cacheManager!.init().then((value) {
+        widget.future?.then((value) {
+          if (widget.cacheManager != null) {
+            widget.cacheManager?.put(value); // there is no need to check contains key because it is already checked in put method
+          }
+        });
+      });
+    }
   }
 
   @override

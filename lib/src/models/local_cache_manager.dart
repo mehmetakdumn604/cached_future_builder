@@ -21,10 +21,24 @@ class LocalCacheManager {
     return null;
   }
 
+  void put<T>(T data) {
+    if (exists()) {
+      if (enableLogging) {
+        log('$cacheKey is already in cache. Skipping put.', name: 'LocalCacheManager');
+      }
+      return;
+    }
+    LocalCaching.instance.put(cacheKey, data);
+    if (enableLogging) {
+      log('$cacheKey is put in cache.', name: 'LocalCacheManager');
+    }
+  }
+
   bool exists() {
     return LocalCaching.instance.get(cacheKey) != null;
   }
-  void init() async {
-    await LocalCaching.instance.init();
+
+  Future<void> init() {
+   return LocalCaching.instance.init();
   }
 }
