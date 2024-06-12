@@ -2,14 +2,15 @@ import 'dart:developer';
 
 import 'package:cached_future_builder/src/caching/local_caching.dart';
 
-class LocalCacheManager {
+class LocalCacheManager<K extends LocalCaching> {
   final String cacheKey;
   final Duration cacheDuration;
   final bool enableLogging;
+  final K localCaching;
 
-  LocalCacheManager({required this.cacheKey, this.cacheDuration = const Duration(days: 1), this.enableLogging = false});
+  LocalCacheManager({required this.cacheKey, this.cacheDuration = const Duration(days: 1), this.enableLogging = false, required this.localCaching});
   T? get<T>() {
-    final data = LocalCaching.instance.get(cacheKey);
+    final data = localCaching.getAs<T>(cacheKey);
     if (data != null) {
       if (enableLogging) {
         log('$cacheKey is found in cache. Returning cached data.', name: 'LocalCacheManager');
@@ -28,17 +29,17 @@ class LocalCacheManager {
       }
       return;
     }
-    LocalCaching.instance.put(cacheKey, data);
+    localCaching.put(cacheKey, data);
     if (enableLogging) {
       log('$cacheKey is put in cache.', name: 'LocalCacheManager');
     }
   }
 
   bool exists() {
-    return LocalCaching.instance.get(cacheKey) != null;
+    return localCaching.get(cacheKey) != null;
   }
 
   Future<void> init() {
-   return LocalCaching.instance.init();
+    return localCaching.init();
   }
 }

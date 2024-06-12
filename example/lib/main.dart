@@ -49,8 +49,28 @@ class HomePage extends StatelessWidget {
           cacheKey: "cachedfuturebuilder",
           enableLogging: true,
           cacheDuration: const Duration(days: 1),
+          localCaching: LocalManager(),
         ),
       ),
     );
+  }
+}
+
+class LocalManager extends LocalCaching {
+  @override
+  get(String key) {
+    // TODO: implement get
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> init() {
+    // TODO: implement init
+    throw UnimplementedError();
+  }
+
+  @override
+  void put(String key, value) {
+    // TODO: implement put
   }
 }

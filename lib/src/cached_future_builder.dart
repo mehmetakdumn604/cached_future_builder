@@ -1,14 +1,18 @@
+import 'dart:developer';
+
 import 'package:cached_future_builder/cached_future_builder.dart';
-import 'package:cached_future_builder/src/models/local_cache_manager.dart';
 import 'package:flutter/material.dart';
 
 class CachedFutureBuilder<T> extends StatefulWidget {
-  const CachedFutureBuilder({super.key, this.future, required this.onData, this.onWaiting, this.onError, this.onNoData, this.cacheManager});
+  const CachedFutureBuilder(
+      {super.key, this.future, required this.onData, this.onWaiting, this.onError, this.onNoData, this.cacheManager, this.saveToLocalCache});
   final Future<T?>? future;
   final Widget Function(T?) onData;
   final Widget Function()? onWaiting;
   final Widget Function(Object?)? onError;
   final Widget Function()? onNoData;
+
+  final Function(String?, T?)? saveToLocalCache;
 
   final LocalCacheManager? cacheManager;
 
@@ -17,19 +21,6 @@ class CachedFutureBuilder<T> extends StatefulWidget {
 }
 
 class _CachedFutureBuilderState<T> extends State<CachedFutureBuilder<T>> with AutomaticKeepAliveClientMixin {
-  @override
-  void initState() {
-    super.initState();
-    if (widget.cacheManager != null) {
-      widget.cacheManager!.init().then((value) {
-        widget.future?.then((value) {
-          if (widget.cacheManager != null) {
-            widget.cacheManager?.put(value); // there is no need to check contains key because it is already checked in put method
-          }
-        });
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +37,19 @@ class _CachedFutureBuilderState<T> extends State<CachedFutureBuilder<T>> with Au
                 return widget.onError?.call(snapshot.error) ?? Center(child: Text(snapshot.error.toString()));
               }
               if (snapshot.hasData && snapshot.data != null) {
-                return widget.onData(snapshot.data);
+                if (widget.cacheManager != null) {
+                  if (!(widget.cacheManager?.exists() ?? true)) {
+                    if (widget.cacheManager?.enableLogging ?? false) {
+                      log('CacheManager is saving ${snapshot.data} to cache with ${widget.cacheManager?.cacheKey}.', name: 'CachedFutureBuilder');
+                    }
+                    widget.cacheManager!.localCaching.put(widget.cacheManager!.cacheKey, snapshot.data);
+                  }
+                  return widget.onData(snapshot.data);
+                }
               }
               return widget.onNoData?.call() ?? const Center(child: Text("No data"));
-            });
+            },
+          );
   }
 
   @override
