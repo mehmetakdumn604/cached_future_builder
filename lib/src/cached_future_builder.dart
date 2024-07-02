@@ -21,7 +21,6 @@ class CachedFutureBuilder<T> extends StatefulWidget {
 }
 
 class _CachedFutureBuilderState<T> extends State<CachedFutureBuilder<T>> with AutomaticKeepAliveClientMixin {
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -46,6 +45,7 @@ class _CachedFutureBuilderState<T> extends State<CachedFutureBuilder<T>> with Au
                   }
                   return widget.onData(snapshot.data);
                 }
+                return widget.onData(snapshot.data);
               }
               return widget.onNoData?.call() ?? const Center(child: Text("No data"));
             },
@@ -54,4 +54,18 @@ class _CachedFutureBuilderState<T> extends State<CachedFutureBuilder<T>> with Au
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.cacheManager != null && widget.cacheManager?.cacheKey != null && widget.cacheManager!.exists() && !stateRefreshed) {
+      if (widget.cacheManager!.enableLogging) {
+        log('CacheManager is loading data from cache with ${widget.cacheManager?.cacheKey}.', name: 'CachedFutureBuilder');
+      }
+      setState(() {});
+      stateRefreshed = true;
+    }
+  }
+
+  bool stateRefreshed = false;
 }
